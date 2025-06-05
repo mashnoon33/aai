@@ -1,11 +1,10 @@
-"use client"
+"use client";
 import "@/styles/globals.css";
 
 import { Geist } from "next/font/google";
 
-import { TrialProvider } from "@/context/trial-context";
 import { TRPCReactProvider } from "@/trpc/react";
-
+import { SidebarProvider } from "@/context/sidebar-context";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -19,9 +18,7 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>
-          <TrialProvider>
-            {children}
-          </TrialProvider>
+          <SidebarProvider>{children}</SidebarProvider>
         </TRPCReactProvider>
       </body>
     </html>

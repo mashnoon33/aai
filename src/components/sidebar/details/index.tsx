@@ -1,63 +1,40 @@
-"use client"
+"use client";
 
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTrial } from "../../../context/trial-context"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSidebar } from "@/context/sidebar-context";
+import type { Trial } from "@/data/trial-store";
 
 export function SidebarDetails() {
-  const { selectedTrial } = useTrial()
+  const { selectedTrial } = useSidebar();
 
   if (!selectedTrial) {
     return (
-      <div className="p-4 text-center text-muted-foreground">
+      <div className="text-muted-foreground p-4 text-center">
         Select a trial to view details
       </div>
-    )
+    );
   }
 
+  const trialFields = Object.keys(selectedTrial).map((key) => ({
+    label: key,
+    value: selectedTrial[key as keyof Trial],
+  }));
+
   return (
-      <ScrollArea className="space-y-4 h-full">
-            <h1 className="text-2xl font-bold">{selectedTrial["Study Title"]}</h1>
-            <div>
-              <h3 className="font-semibold">NCT Number</h3>
-              <p>{selectedTrial["NCT Number"]}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Status</h3>
-              <p>{selectedTrial["Study Status"]}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Brief Summary</h3>
-              <p className="whitespace-pre-wrap">{selectedTrial["Brief Summary"]}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Conditions</h3>
-              <p>{selectedTrial.Conditions}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Interventions</h3>
-              <p>{selectedTrial.Interventions}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Sponsor</h3>
-              <p>{selectedTrial.Sponsor}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Study Type</h3>
-              <p>{selectedTrial["Study Type"]}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Study Design</h3>
-              <p>{selectedTrial["Study Design"]}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Enrollment</h3>
-              <p>{selectedTrial.Enrollment}</p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Dates</h3>
-              <p>Start: {selectedTrial["Start Date"]}</p>
-              <p>Completion: {selectedTrial["Completion Date"]}</p>
-            </div>
-      </ScrollArea>
-  )
+    <ScrollArea className="h-full px-4">
+      <header className="mb-6">
+        <h1 className="text-primary text-2xl font-bold">
+          {selectedTrial["Study Title"]}
+        </h1>
+      </header>
+      <section className="grid grid-cols-1 gap-2">
+        {trialFields.map(({ label, value }) => (
+          <article key={label} className="">
+            <h3 className="text-lg font-medium">{label}</h3>
+            <p className="mt-1 text-sm text-gray-600">{value || "N/A"}</p>
+          </article>
+        ))}
+      </section>
+    </ScrollArea>
+  );
 }

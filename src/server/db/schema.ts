@@ -1,8 +1,8 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
 import { index, pgTableCreator } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -12,16 +12,21 @@ import { index, pgTableCreator } from "drizzle-orm/pg-core";
  */
 export const createTable = pgTableCreator((name) => `argon_${name}`);
 
-export const posts = createTable(
-  "post",
+export const embeddings = createTable(
+  "embeddings",
   (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    id: d
+      .varchar({ length: 21 })
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    resourceId: d.varchar({ length: 11 }).notNull().unique(),
+    content: d.text().notNull(),
+    embedding: d.vector({ dimensions: 1536 }).notNull(),
   }),
-  (t) => [index("name_idx").on(t.name)],
+  (t) => ({
+    embeddingIndex: index("embeddingIndex").using(
+      "hnsw",
+      t.embedding.op("vector_cosine_ops"),
+    ),
+  }),
 );
